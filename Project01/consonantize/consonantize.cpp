@@ -26,12 +26,19 @@ string consonatizeHelper(string s, int idx) {
     }
     return consonatizeHelper(s, idx+1);
 }
-string consonatize(string s) {
+string consonantize(string s) {
     return consonatizeHelper(s, 0);
 }
 
 int main() {
-    cout << consonatize("lowercase") << endl;
+    cout << consonantize("lowercase") << endl;
+    cout << consonantize("uppercase")  << endl; 
+    cout << consonantize("2.718281828459045")  << endl;
+    cout << consonantize("'Hi, Mom!'")  << endl;
+    cout << consonantize("A") << endl;
+    cout << consonantize("+") << endl;
+    cout << consonantize("Q") << endl;
+
 }
 
 /* * * * * * Test Cases * * * * *
