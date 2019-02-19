@@ -20,7 +20,7 @@ public:
       backingVector[i].resize(size);
     }
   }
-  bool inBounds(int r, int c) { return r < size && c < size; }
+  bool inBounds(int r, int c) { return r < size && c < size && r >= 0 && c >= 0; }
   vector<int> &operator[](int i) { return backingVector[i]; }
 
   void print() {
@@ -49,8 +49,12 @@ void dropUnit(Grid &world, int row, int col) {
 
 int main() {
   Grid g(5);
+
+  g[3][2] = 3;
+  g[1][2] = 3;
   g[2][2] = 3;
   g[2][3] = 3;
+  g[2][1] = 3;
 
   g.print();
   dropUnit(g, 2, 2);
