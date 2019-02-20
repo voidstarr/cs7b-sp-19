@@ -51,9 +51,9 @@ public:
     if (colSize != g.getColSize() || rowSize != g.getRowSize())
       return false;
 
-    for (int i = 0; i < backingVector.size(); i++)
-      for (int j = 0; j < backingVector[i].size(); j++)
-        if (backingVector[i][j] != g.getBackingVector()[i][j])
+    for (int i = 0; i < rowSize; i++)
+      for (int j = 0; j < colSize; j++)
+        if ((*this)[i][j] != g[i][j])
           return false;
 
     return true;
@@ -62,8 +62,6 @@ public:
   int getRowSize() { return rowSize; }
 
   int getColSize() { return colSize; }
-
-  vector<vector<int>> &getBackingVector() { return backingVector; }
 
   void print() {
     for (int i = 0; i < backingVector.size(); i++) {
