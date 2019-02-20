@@ -10,36 +10,41 @@ using namespace std;
 class Grid {
 private:
   vector<vector<int>> backingVector;
-  int size;
+  int rowSize, colSize;
 
 public:
   Grid(int s) {
-    size = s;
-    backingVector.resize(size);
-    for (int i = 0; i < size; i++) {
-      backingVector[i].resize(size);
-    }
+    // initialize a square blank grid
+    rowSize = colSize = s;
+    backingVector.resize(s);
+    for (int i = 0; i < s; i++)
+      backingVector[i].resize(s);
   }
 
   Grid(initializer_list<initializer_list<int>> il) {
-    size = il.size();
-    backingVector.resize(size);
+    // construct grid from predefined initializer_list
+    rowSize = il.size();
+    backingVector.resize(rowSize);
     int i = 0;
     for (auto a : il) {
-      if (a.size() != size)
-        throw "Bad dimensions of initializer_list for Grid! Not square!";
+      if (i == 0)
+        colSize = a.size();
+      else if (a.size() != colSize)
+        throw "Bad dimensions of initializer_list for Grid! Not rectangular!";
       backingVector[i++] = vector<int>(a);
     }
   }
 
   bool inBounds(int r, int c) {
-    return r < size && c < size && r >= 0 && c >= 0;
+    // cout << "r: " << r << " c: " << c << ((r < rowSize && c < colSize && r >=
+    // 0 && c >= 0)?"in" : "out") << " of bounds." << endl;
+    return r < rowSize && c < colSize && r >= 0 && c >= 0;
   }
 
   vector<int> &operator[](int i) { return backingVector[i]; }
 
   bool operator==(Grid &g) {
-    if (size != g.getSize())
+    if (colSize != g.getColSize() || rowSize != g.getRowSize())
       return false;
 
     for (int i = 0; i < backingVector.size(); i++)
@@ -50,7 +55,9 @@ public:
     return true;
   }
 
-  int getSize() { return size; }
+  int getRowSize() { return rowSize; }
+
+  int getColSize() { return colSize; }
 
   vector<vector<int>> &getBackingVector() { return backingVector; }
 
@@ -79,78 +86,43 @@ void dropUnit(Grid &world, int row, int col) {
 }
 
 int main() {
-  Grid before({{0, 0, 0}, {1, 3, 1}, {0, 2, 0}});
-  Grid after({{0, 1, 0}, {2, 0, 2}, {0, 3, 0}});
+  try {
+    Grid before{{0, 0, 0}, {1, 3, 1}, {0, 2, 0}};
+    Grid after{{0, 1, 0}, {2, 0, 2}, {0, 3, 0}};
+    dropUnit(before, 1, 1);
+    if (after == before) {
+      cout << "after == before" << endl;
+    }
 
-  dropUnit(before, 1, 1);
+    Grid before1{{3, 3, 3}, {3, 0, 3}, {3, 3, 3}};
+    Grid after1{{3, 3, 3}, {3, 1, 3}, {3, 3, 3}};
+    dropUnit(before1, 1, 1);
+    if (before1 == after1) {
+      cout << "after1 == before1" << endl;
+    }
 
-  if (after == before) {
-    cout << "after == before" << endl;
+    Grid before2{{0, 0, 0, 0}, {0, 3, 3, 0}, {0, 0, 0, 0}};
+    Grid after2{{0, 1, 1, 0}, {1, 1, 0, 1}, {0, 1, 1, 0}};
+    dropUnit(before2, 1, 1);
+    if (before2 == after2) {
+      cout << "after2 == before2" << endl;
+    }
+  } catch (char *c) {
+    cout << c << endl;
   }
 }
 
-/* * * * * * Tests Below This Point * * * * *
- //  Create a simple source grid.
-    Grid before  {
-        { 3, 3, 3 },
-        { 3, 0, 3 },
-        { 3, 3, 3 }
-    };
-    Grid after  {
-        { 3, 3, 3 },
-        { 3, 1, 3 },
-        { 3, 3, 3 }
-    };
-
-    dropUnit(before, 1, 1);
-    before == after; // The above call changes 'before.'
-
-// Non-chaining diffues work.
-// Create a simple source grid.
-    Grid before  {
-        { 0, 0, 0 },
-        { 1, 3, 1 },
-        { 0, 2, 0 }
-    };
-    Grid after  {
-        { 0, 1, 0 },
-        { 2, 0, 2 },
-        { 0, 3, 0 }
-    };
-
-    dropUnit(before, 1, 1);
-    before == after; // The above call changes 'before.'
-}
-
-Two diffuses chain.
-// Create a simple source grid.
-    Grid before  {
-        { 0, 0, 0, 0 },
-        { 0, 3, 3, 0 },
-        { 0, 0, 0, 0 }
-    };
-    Grid after  {
-        { 0, 1, 1, 0 },
-        { 1, 1, 0, 1 },
-        { 0, 1, 1, 0 }
-    };
-
-    dropUnit(before, 1, 1);
-    before == after; // The above call changes 'before.'
-}*/
-
 /* TODO: You will need to add your own tests into this suite of test cases.
  * Think about the sorts
- * of inputs we tested here, and, importantly, what sorts of inputs we *didn't*
- * test here. Some
- * general rules of testing:
+ * of inputs we tested here, and, importantly, what sorts of inputs we
+ * *didn't* test here. Some general rules of testing:
  *
  *    1. Try extreme cases. What are some very large cases to check? What are
  * some very small cases?
  *
- *    2. Be diverse. There are a lot of possible inputs out there. Make sure you
- * have tests that account
- *       for cases that aren't just variations of one another.
+ *    2. Be diverse. There are a lot of possible inputs out there. Make sure
+ * you have tests that account for cases that aren't just variations of one
+ * another.
  *
  *    3. Be sneaky. Don't just try standard inputs. Try weird ones that you
  * wouldn't expect anyone to
