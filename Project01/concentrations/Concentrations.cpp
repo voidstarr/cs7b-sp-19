@@ -13,12 +13,18 @@ private:
   int rowSize, colSize;
 
 public:
-  Grid(int s) {
+  Grid(int s) : rowSize(s), colSize(s) {
     // initialize a square blank grid
-    rowSize = colSize = s;
     backingVector.resize(s);
     for (int i = 0; i < s; i++)
       backingVector[i].resize(s);
+  }
+
+  Grid(int r, int c) : rowSize(r), colSize(c) {
+    // initialize a rectangular blank grid
+    backingVector.resize(r);
+    for (int i = 0; i < c; i++)
+      backingVector[i].resize(c);
   }
 
   Grid(initializer_list<initializer_list<int>> il) {
@@ -36,8 +42,6 @@ public:
   }
 
   bool inBounds(int r, int c) {
-    // cout << "r: " << r << " c: " << c << ((r < rowSize && c < colSize && r >=
-    // 0 && c >= 0)?"in" : "out") << " of bounds." << endl;
     return r < rowSize && c < colSize && r >= 0 && c >= 0;
   }
 
@@ -63,9 +67,8 @@ public:
 
   void print() {
     for (int i = 0; i < backingVector.size(); i++) {
-      for (int j = 0; j < backingVector[i].size(); j++) {
+      for (int j = 0; j < backingVector[i].size(); j++)
         cout << backingVector[i][j] << " ";
-      }
       cout << endl;
     }
     cout << endl;
