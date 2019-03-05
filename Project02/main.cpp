@@ -63,9 +63,7 @@ int main() {
   ofstream wordsOut("sixLetterWordsFromSymbols.txt");
   if (wordsOut.is_open()) {
     for (int i = 0; i < wordsOutList.size(); i++) {
-      if (i % 3 == 0)
-        wordsOut << "\n";
-      wordsOut << wordsOutList[i] << " ";
+      wordsOut << wordsOutList[i] << ((0 == (i + 1) % 3) ? '\n' : ' ');
     }
     wordsOut.close();
   }
