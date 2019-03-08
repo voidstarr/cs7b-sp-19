@@ -25,6 +25,8 @@ vector<string> combination;
 
 vector<string> wordsInList;
 
+vector<string> generatedCombos;
+
 vector<string> wordsOutList;
 
 void drawGrid(vector<vector<string>> vvs) {
@@ -63,8 +65,8 @@ void drawGrid(vector<vector<string>> vvs) {
         txt.setFont(font);
         txt.setCharacterSize(56);
         // TODO: grab string from resultant vector of sudoku word finder thing
-        // txt.setString(vvs[i][j]);
-        txt.setString("ayy lmao");
+        txt.setString(vvs[i][j]);
+        //txt.setString("ayy lmao");
         txt.setFillColor(Color::Red);
         float xshift = 100.0f - txt.getLocalBounds().width / 2;
         float yshift = 100.0f - txt.getLocalBounds().height / 2;
@@ -88,12 +90,12 @@ void generateCombinations(int offset, int k) {
   if (k == 0) {
     stringstream ss;
     for (int i = 0; i < combination.size(); i++) {
+      transform(combination[i].begin(), combination[i].end(),
+                combination[i].begin(), ::tolower);
       ss << combination[i];
     }
-    if (wordIsInList(ss.str())) {
-      wordsOutList.push_back(ss.str());
-      cout << "wordsOutList add: " << ss.str() << endl;
-    }
+
+    generatedCombos.push_back(ss.str());
     return;
   }
   for (int i = offset; i <= symbols.size() - k; ++i) {
@@ -132,14 +134,60 @@ bool gridComplete(vector<vector<string>> vvs) {
 }
 
 void generateGrid(vector<vector<string>> &vvs) {
-  // TODO: find some 3x3 combination of chem symbols that 
+  // TODO: find some 3x3 combination of chem symbols that
   // create words in all directions in a sudoku like fashion
-  while(!gridComplete(vvs)) {
-    // TODO: bogo sort style grid creation?
+
+  vector<string> symbolsInScrabbleWords;
+  for (int i = 0; i < wordsOutList.size(); i++) {
+    symbolsInScrabbleWords.push_back(wordsOutList[i].substr(0, 2));
+    symbolsInScrabbleWords.push_back(wordsOutList[i].substr(1, 2));
+    symbolsInScrabbleWords.push_back(wordsOutList[i].substr(3, 2));
+  }
+
+  sort(symbolsInScrabbleWords.begin(), symbolsInScrabbleWords.end());
+  symbolsInScrabbleWords.erase(
+      unique(symbolsInScrabbleWords.begin(), symbolsInScrabbleWords.end()),
+      symbolsInScrabbleWords.end());
+
+  /*
+  {i, j, k}
+  {l, m, n}
+  {o, p, q}
+  */
+  for (int i = 0; i < symbolsInScrabbleWords.size(); i++) {
+    for (int j = 0; j < symbolsInScrabbleWords.size(); j++) {
+      for (int k = 0; k < symbolsInScrabbleWords.size(); k++) {
+        for (int l = 0; l < symbolsInScrabbleWords.size(); l++) {
+          for (int m = 0; m < symbolsInScrabbleWords.size(); m++) {
+            for (int n = 0; n < symbolsInScrabbleWords.size(); n++) {
+              for (int o = 0; o < symbolsInScrabbleWords.size(); o++) {
+                for (int p = 0; p < symbolsInScrabbleWords.size(); p++) {
+                  for (int q = 0; q < symbolsInScrabbleWords.size(); q++) {
+                    vvs[0][0] = symbolsInScrabbleWords[i];
+                    vvs[0][1] = symbolsInScrabbleWords[j];
+                    vvs[0][2] = symbolsInScrabbleWords[k];
+                    vvs[1][0] = symbolsInScrabbleWords[l];
+                    vvs[1][1] = symbolsInScrabbleWords[m];
+                    vvs[1][2] = symbolsInScrabbleWords[n];
+                    vvs[2][0] = symbolsInScrabbleWords[o];
+                    vvs[2][1] = symbolsInScrabbleWords[p];
+                    vvs[2][2] = symbolsInScrabbleWords[q];
+                    if (gridComplete(vvs)) {
+                      return;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
 
 int main() {
+  // read in scrabble words
   ifstream wordsIn("sixLetterWords.txt");
   string tmp;
   while (wordsIn) {
@@ -148,8 +196,21 @@ int main() {
   }
   wordsIn.close();
 
+  // generate words from three chemical symbols
   generateCombinations(0, 3);
 
+  // find intersection between generatedCombos vector, and
+  // wordsIn vector
+  sort(generatedCombos.begin(), generatedCombos.end());
+  sort(wordsInList.begin(), wordsInList.end());
+  set_intersection(generatedCombos.begin(), generatedCombos.end(),
+                   wordsInList.begin(), wordsInList.end(),
+                   back_inserter(wordsOutList));
+
+  cout << "intersection size: " << wordsOutList.size() << endl;
+
+  // write the scrabble words that are composed of chemical symbols
+  // to a file
   ofstream wordsOut("sixLetterWordsFromSymbols.txt");
   if (wordsOut.is_open()) {
     for (int i = 0; i < wordsOutList.size(); i++) {
@@ -159,6 +220,12 @@ int main() {
   }
 
   vector<vector<string>> gridSymbols;
+  gridSymbols.resize(3);
+  for (int i = 0; i < 3; i++) {
+    vector<string> vs;
+    vs.resize(3);
+    gridSymbols[i] = vs;
+  }
   generateGrid(gridSymbols);
 
   drawGrid(gridSymbols);
